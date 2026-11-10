@@ -26,4 +26,6 @@
     <string name="timeout">Timeout</string>
     <string name="chat_paused">Chat paused</string>
     <string name="alerts_load_error">Can\'t load alerts</string>
+    <string name="donationalerts_login">Log In via DonationAlerts</string>
+    <string name="anonymous">Anonymous</string>
 </resources>
