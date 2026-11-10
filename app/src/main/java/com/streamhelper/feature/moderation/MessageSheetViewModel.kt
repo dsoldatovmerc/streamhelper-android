@@ -59,6 +59,9 @@ class MessageSheetViewModel @Inject constructor(
 
     private var loadUserJob: Job? = null
 
+    /** Bumped per action and per open/close, so a finishing action only clears its own in-flight flag. */
+    private var actionToken = 0L
+
     init {
         viewModelScope.launch {
             chatRepository.messages.collect { messages ->
@@ -76,7 +79,10 @@ class MessageSheetViewModel @Inject constructor(
         if (message.authorId.isBlank()) return
         loadUserJob?.cancel()
         val live = chatRepository.messages.value.firstOrNull { it.id == message.id } ?: message
-        _uiState.update { it.copy(isOpen = true, selected = SelectedMessage(user = null, message = live)) }
+        actionToken++
+        _uiState.update {
+            it.copy(isOpen = true, selected = SelectedMessage(user = null, message = live), isActionInFlight = false)
+        }
         loadUserJob = viewModelScope.launch {
             try {
                 val user = moderationRepository.getUserById(message.authorId)
@@ -135,23 +141,29 @@ class MessageSheetViewModel @Inject constructor(
         }
     }
 
-    /** Runs one action for the loaded selection; ignored while another is in flight. The sheet stays open. */
+    /**
+     * Runs one action for the loaded selection; ignored while another is in flight. The sheet stays
+     * open. A request still running when the sheet closes or switches message finishes (and shows its
+     * snackbar) but no longer disables the new selection's actions.
+     */
     private fun runAction(action: suspend (SelectedMessage) -> Unit) {
         val state = _uiState.value
         val selected = state.selected
         if (state.isActionInFlight || selected?.user == null) return
+        val token = ++actionToken
         _uiState.update { it.copy(isActionInFlight = true) }
         viewModelScope.launch {
             try {
                 action(selected)
             } finally {
-                _uiState.update { it.copy(isActionInFlight = false) }
+                if (token == actionToken) _uiState.update { it.copy(isActionInFlight = false) }
             }
         }
     }
 
     private fun close() {
-        _uiState.update { it.copy(isOpen = false, selected = null) }
+        actionToken++
+        _uiState.update { it.copy(isOpen = false, selected = null, isActionInFlight = false) }
     }
 
     private companion object {

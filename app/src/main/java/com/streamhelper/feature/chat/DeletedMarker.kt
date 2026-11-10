@@ -13,8 +13,11 @@ import com.streamhelper.R
  * renderer never parses the marker) and the suffix is added at render time instead.
  */
 object DeletedText {
+    /** `"- <deletedLabel>"`, the marker on its own. Pure. */
+    fun marker(deletedLabel: String): String = "- $deletedLabel"
+
     /** `"<text> - <deletedLabel>"`. Pure. */
-    fun withSuffix(text: String, deletedLabel: String): String = "$text - $deletedLabel"
+    fun withSuffix(text: String, deletedLabel: String): String = "$text ${marker(deletedLabel)}"
 }
 
 /**
@@ -24,7 +27,7 @@ object DeletedText {
 @Composable
 fun DeletedMarker(modifier: Modifier = Modifier) {
     Text(
-        text = "- " + stringResource(R.string.deleted),
+        text = DeletedText.marker(stringResource(R.string.deleted)),
         style = MaterialTheme.typography.bodyLarge,
         modifier = modifier,
     )

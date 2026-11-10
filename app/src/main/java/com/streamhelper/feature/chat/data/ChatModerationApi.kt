@@ -1,11 +1,5 @@
 package com.streamhelper.feature.chat.data
 
-import com.streamhelper.core.network.Twitch
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import retrofit2.Retrofit
 import retrofit2.http.DELETE
 import retrofit2.http.Query
 
@@ -18,12 +12,4 @@ interface ChatModerationApi {
         @Query("moderator_id") moderatorId: String,
         @Query("message_id") messageId: String,
     )
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-object ChatModerationApiModule {
-    @Provides
-    fun chatModerationApi(@Twitch retrofit: Retrofit): ChatModerationApi =
-        retrofit.create(ChatModerationApi::class.java)
 }
