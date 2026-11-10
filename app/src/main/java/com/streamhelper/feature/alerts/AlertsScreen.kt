@@ -48,7 +48,8 @@ fun AlertsScreen(viewModel: AlertsViewModel = hiltViewModel()) {
         } else {
             LoadingButton(
                 text = stringResource(R.string.donationalerts_login),
-                isLoading = state.isLoading,
+                // Loading for the whole login, from opening the page until the token is saved (RN parity).
+                isLoading = state.isLoading || state.oauthRequest != null,
                 onClick = viewModel::onLoginClick,
                 modifier = Modifier.align(Alignment.Center),
             )

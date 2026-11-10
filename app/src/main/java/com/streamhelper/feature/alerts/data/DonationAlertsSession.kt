@@ -1,6 +1,11 @@
 package com.streamhelper.feature.alerts.data
 
 import com.streamhelper.core.session.LogoutHook
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,4 +29,13 @@ class DonationAlertsSession @Inject constructor() : LogoutHook {
     }
 
     override suspend fun onLoggedOut() = setAccessToken(null)
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class DonationAlertsHooksModule {
+    /** Twitch logout also drops the in-memory DonationAlerts token. */
+    @Binds
+    @IntoSet
+    abstract fun bindSessionLogoutHook(impl: DonationAlertsSession): LogoutHook
 }

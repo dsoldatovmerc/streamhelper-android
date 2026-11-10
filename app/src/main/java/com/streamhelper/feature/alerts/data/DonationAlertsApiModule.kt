@@ -1,12 +1,9 @@
 package com.streamhelper.feature.alerts.data
 
-import com.streamhelper.core.session.LogoutHook
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoSet
 import javax.inject.Qualifier
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
@@ -45,13 +42,4 @@ object DonationAlertsApiModule {
 
     @Provides
     fun alertsApi(@DonationAlerts retrofit: Retrofit): AlertsApi = retrofit.create(AlertsApi::class.java)
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class DonationAlertsHooksModule {
-    /** Twitch logout also drops the in-memory DonationAlerts token. */
-    @Binds
-    @IntoSet
-    abstract fun bindSessionLogoutHook(impl: DonationAlertsSession): LogoutHook
 }
