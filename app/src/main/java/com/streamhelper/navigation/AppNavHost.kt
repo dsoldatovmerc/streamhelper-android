@@ -45,6 +45,11 @@ fun AppNavHost() {
         composable<MainRoute> {
             MainScreen(
                 onOpenWebView = { uri -> navController.navigate(WebViewRoute(uri)) },
+                onLoggedOut = {
+                    navController.navigate(AuthGraph) {
+                        popUpTo<MainRoute> { inclusive = true }
+                    }
+                },
             )
         }
 

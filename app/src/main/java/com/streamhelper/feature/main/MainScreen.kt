@@ -45,7 +45,10 @@ private val tabs = listOf(
 )
 
 @Composable
-fun MainScreen(@Suppress("UNUSED_PARAMETER") onOpenWebView: (String) -> Unit) {
+fun MainScreen(
+    @Suppress("UNUSED_PARAMETER") onOpenWebView: (String) -> Unit,
+    onLoggedOut: () -> Unit,
+) {
     val tabNavController = rememberNavController()
     val backStackEntry by tabNavController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
@@ -75,7 +78,7 @@ fun MainScreen(@Suppress("UNUSED_PARAMETER") onOpenWebView: (String) -> Unit) {
             startDestination = ChatRoute,
             modifier = Modifier.padding(innerPadding),
         ) {
-            composable<ChatRoute> { ChatScreen() }
+            composable<ChatRoute> { ChatScreen(onLoggedOut = onLoggedOut) }
             composable<AlertsRoute> { AlertsScreen() }
             composable<RaidRoute> { RaidScreen() }
             composable<StreamInfoRoute> { StreamInfoScreen() }

@@ -12,5 +12,7 @@ object AppColors {
     val White = Color(0xFFFFFFFF)
     val Black = Color(0xFF000000)
     val Danger = Color(0xFFDC3545)
+    /** Success accent (RN toast used CSS `green`). */
+    val Success = Color(0xFF008000)
     val Donation = Color(0xFFF57D07)
 }
