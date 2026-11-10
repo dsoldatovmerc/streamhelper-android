@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="server_error">Ошибка сервера</string>
+    <string name="something_went_wrong">Что-то пошло не так</string>
+    <string name="please_try_again">Пожалуйста, попробуйте снова</string>
+    <string name="success">Успех</string>
+    <string name="error">Ошибка</string>
+    <string name="logout">Выйти из аккаунта</string>
+    <string name="login">Войти с помощью Twitch</string>
+    <string name="chat_connection_error">Не удалось подключиться к чату</string>
+    <string name="chat_connection_success">Добро пожаловать в чат!</string>
+    <string name="successfully_timed_out">Пользователь был отстранен</string>
+    <string name="successfully_banned">Пользователь был забанен</string>
+    <string name="successfully_unbanned">Пользователь был разблокирован</string>
+    <string name="successfully_deleted">Сообщение удалено</string>
+    <string name="delete">Удалить</string>
+    <string name="deleted">Удалено</string>
+    <string name="ban">Бан</string>
+    <string name="unban">Разбан</string>
+    <string name="timeout">Отстранить</string>
+    <string name="chat_paused">Чат приостановлен</string>
+    <string name="alerts_load_error">Не удалось загрузить оповещения</string>
+</resources>

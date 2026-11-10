@@ -1,0 +1,9 @@
+# Copy to local.properties (git-ignored) and fill in. Android Studio also writes sdk.dir here.
+sdk.dir=/path/to/Android/sdk
+
+TWITCH_CLIENT_ID=
+TWITCH_AUTH_URL=https://id.twitch.tv/oauth2/authorize
+REDIRECT_URI=https://streamhelpermobile.com/login
+TWITCH_WS_URL=wss://eventsub.wss.twitch.tv/ws
+DONATIONALERTS_AUTH_URL=
+DONATIONALERTS_CLIENT_ID=

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Window theme only; all UI styling lives in the Compose theme (ui/theme). Light-only for now. -->
+    <style name="Theme.StreamHelper" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.StreamHelper.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.StreamHelper</item>
+    </style>
+</resources>

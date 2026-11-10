@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">StreamHelper</string>
+    <string name="app_title" translatable="false">Stream Helper</string>
+    <string name="tab_chat" translatable="false">Chat</string>
+    <string name="tab_alerts" translatable="false">Alerts</string>
+    <string name="tab_raid" translatable="false">Raid</string>
+    <string name="tab_stream_info" translatable="false">StreamInfo</string>
+    <string name="server_error">Server error</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="please_try_again">Please try again</string>
+    <string name="success">Success</string>
+    <string name="error">Error</string>
+    <string name="logout">Logout</string>
+    <string name="login">Log In via Twitch</string>
+    <string name="chat_connection_error">Can\'t connect to chat</string>
+    <string name="chat_connection_success">Welcome to the chat!</string>
+    <string name="successfully_timed_out">User has been timed out</string>
+    <string name="successfully_banned">User has been banned</string>
+    <string name="successfully_unbanned">User has been unbanned</string>
+    <string name="successfully_deleted">The message has been deleted</string>
+    <string name="delete">Delete</string>
+    <string name="deleted">Deleted</string>
+    <string name="ban">Ban</string>
+    <string name="unban">Unban</string>
+    <string name="timeout">Timeout</string>
+    <string name="chat_paused">Chat paused</string>
+    <string name="alerts_load_error">Can\'t load alerts</string>
+</resources>
