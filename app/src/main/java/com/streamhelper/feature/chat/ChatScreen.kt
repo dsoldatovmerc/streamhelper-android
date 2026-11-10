@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -112,12 +113,14 @@ private fun ChatMessageList(
                 last.offset + last.size <= info.viewportEndOffset + thresholdPx
         }
     }
-    // True while we animate to the newest message, so that scroll isn't mistaken for the user's.
-    var isAutoScrolling by remember { mutableStateOf(false) }
+    // Count of running auto-scrolls (a new message cancels the previous one, so a Boolean could be
+    // cleared by the cancelled run after the new one set it). Non-zero → scroll isn't the user's.
+    var autoScrolls by remember { mutableIntStateOf(0) }
+    var hasScrolledInitially by remember { mutableStateOf(false) }
     val atBottomChanged by rememberUpdatedState(onAtBottomChanged)
 
     LaunchedEffect(listState) {
-        snapshotFlow { isAtBottom to (listState.isScrollInProgress && !isAutoScrolling) }
+        snapshotFlow { isAtBottom to (listState.isScrollInProgress && autoScrolls == 0) }
             .distinctUntilChanged()
             .collect { (atBottom, userScrolling) ->
                 if (atBottom) {
@@ -130,11 +133,17 @@ private fun ChatMessageList(
 
     LaunchedEffect(messages.size) {
         if (isPaused || messages.isEmpty()) return@LaunchedEffect
-        isAutoScrolling = true
+        autoScrolls++
         try {
-            listState.animateScrollToItem(messages.lastIndex)
+            if (hasScrolledInitially) {
+                listState.animateScrollToItem(messages.lastIndex)
+            } else {
+                // Entering the screen with history: jump instead of animating through it.
+                listState.scrollToItem(messages.lastIndex)
+                hasScrolledInitially = true
+            }
         } finally {
-            isAutoScrolling = false
+            autoScrolls--
         }
     }
 

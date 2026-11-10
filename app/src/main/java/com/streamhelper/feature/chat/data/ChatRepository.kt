@@ -89,7 +89,19 @@ class ChatRepository @Inject constructor(
     private val seenMessageIds = HashSet<String>()
 
     init {
-        appScope.launch { for (input in inputs) handle(input) }
+        appScope.launch {
+            for (input in inputs) {
+                try {
+                    handle(input)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    // Keep the actor alive: a dead loop would freeze chat and hang logout.
+                    Log.e(TAG, "Handling $input failed", e)
+                    if (input is Input.Logout) input.done.complete(Unit)
+                }
+            }
+        }
         appScope.launch {
             appLifecycle.currentStateFlow
                 .map { it.isAtLeast(Lifecycle.State.STARTED) }
