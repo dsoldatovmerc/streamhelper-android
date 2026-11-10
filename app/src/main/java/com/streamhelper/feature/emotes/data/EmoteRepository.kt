@@ -4,6 +4,7 @@ import android.util.Log
 import com.streamhelper.core.coroutines.IoDispatcher
 import com.streamhelper.core.session.LogoutHook
 import com.streamhelper.core.session.PostLoginHook
+import com.streamhelper.core.session.TwitchSession
 import com.streamhelper.core.session.TwitchUser
 import com.streamhelper.feature.emotes.Emote
 import com.streamhelper.feature.emotes.EmoteSets
@@ -34,6 +35,7 @@ import kotlinx.coroutines.withContext
 class EmoteRepository @Inject constructor(
     private val sevenTvApi: SevenTvApi,
     private val twitchApi: TwitchEmoteApi,
+    private val session: TwitchSession,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PostLoginHook, LogoutHook {
 
@@ -42,16 +44,15 @@ class EmoteRepository @Inject constructor(
     /** Both sets; each is replaced as soon as it loads. Empty until then and after logout. */
     val emotes: StateFlow<EmoteSets> = _emotes.asStateFlow()
 
-    // Bumped on logout so a load that was in flight doesn't publish a previous account's emotes.
+    // Orders publishing against clearing, so a load still in flight at logout can't publish
+    // the previous account's emotes (see [publish]).
     private val lock = Mutex()
-    private var generation = 0L
 
     override suspend fun onLoggedIn(user: TwitchUser) {
-        val loadGeneration = lock.withLock { generation }
         coroutineScope {
             launch {
                 val sevenTv = loadOrEmpty("7TV") { sevenTvApi.getUserByTwitchId(user.id).toEmoteMap() }
-                publish(loadGeneration) { it.copy(sevenTv = sevenTv) }
+                publish(user) { it.copy(sevenTv = sevenTv) }
             }
             launch {
                 val twitch = loadOrEmpty("Twitch") {
@@ -59,21 +60,23 @@ class EmoteRepository @Inject constructor(
                     val channel = async { twitchApi.getChannelEmotes(user.id) }
                     twitchEmoteMap(global.await(), channel.await())
                 }
-                publish(loadGeneration) { it.copy(twitch = twitch) }
+                publish(user) { it.copy(twitch = twitch) }
             }
         }
     }
 
     override suspend fun onLoggedOut() {
-        lock.withLock {
-            generation++
-            _emotes.value = EmoteSets.Empty
-        }
+        lock.withLock { _emotes.value = EmoteSets.Empty }
     }
 
-    private suspend fun publish(loadGeneration: Long, change: (EmoteSets) -> EmoteSets) {
+    /**
+     * Applies [change] only while [user] is still signed in. Logout clears [TwitchSession] before
+     * running [onLoggedOut], so a publish either sees the session gone and is dropped, or lands
+     * first and is wiped by the clear.
+     */
+    private suspend fun publish(user: TwitchUser, change: (EmoteSets) -> EmoteSets) {
         lock.withLock {
-            if (loadGeneration == generation) _emotes.update(change)
+            if (session.userId == user.id) _emotes.update(change)
         }
     }
 

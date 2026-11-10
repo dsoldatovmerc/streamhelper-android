@@ -7,11 +7,11 @@ internal const val TWITCH_EMOTE_SIZE = 32
 
 /**
  * Maps a 7TV user to `name → Emote`, using each emote's first file:
- * `"https:" + host.url + "/" + files[0].name`, sized by that file. Emotes without files are skipped.
+ * `"https:" + host.url + "/" + files[0].name`, sized by that file. Emotes without host data or files are skipped.
  */
 internal fun SevenTvUserDto.toEmoteMap(): Map<String, Emote> =
     emoteSet?.emotes.orEmpty().mapNotNull { emote ->
-        val host = emote.data.host
+        val host = emote.data?.host ?: return@mapNotNull null
         val file = host.files.firstOrNull() ?: return@mapNotNull null
         emote.name to Emote(url = "https:${host.url}/${file.name}", width = file.width, height = file.height)
     }.toMap()

@@ -19,10 +19,10 @@ data class SevenTvUserDto(@SerialName("emote_set") val emoteSet: SevenTvEmoteSet
 data class SevenTvEmoteSetDto(val emotes: List<SevenTvEmoteDto>? = null)
 
 @Serializable
-data class SevenTvEmoteDto(val name: String, val data: SevenTvEmoteDataDto)
+data class SevenTvEmoteDto(val name: String, val data: SevenTvEmoteDataDto? = null)
 
 @Serializable
-data class SevenTvEmoteDataDto(val host: SevenTvHostDto)
+data class SevenTvEmoteDataDto(val host: SevenTvHostDto? = null)
 
 /** [url] is protocol-relative (`//cdn.7tv.app/emote/<id>`). */
 @Serializable
