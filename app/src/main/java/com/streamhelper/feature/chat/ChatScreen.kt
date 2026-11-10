@@ -37,6 +37,8 @@ import com.streamhelper.R
 import com.streamhelper.core.ui.components.LoadingButton
 import com.streamhelper.core.ui.theme.AppColors
 import com.streamhelper.feature.chat.data.ChatMessage
+import com.streamhelper.feature.moderation.MessageSheet
+import com.streamhelper.feature.moderation.MessageSheetViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 /** RN `screens/Main/Chat`: Logout button, connection/paused banners, pull-to-refresh message list. */
@@ -44,6 +46,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 fun ChatScreen(
     onLoggedOut: () -> Unit,
     viewModel: ChatViewModel = hiltViewModel(),
+    messageSheetViewModel: MessageSheetViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val loggedOut by rememberUpdatedState(onLoggedOut)
@@ -76,7 +79,7 @@ fun ChatScreen(
                 isPaused = state.isPaused,
                 onRefresh = viewModel::onRefresh,
                 onAtBottomChanged = viewModel::onAtBottomChanged,
-                onMessageClick = viewModel::onMessageClick,
+                onMessageClick = messageSheetViewModel::onMessageClick,
             )
             if (state.isPaused) {
                 ChatBanner(
@@ -87,6 +90,7 @@ fun ChatScreen(
             }
         }
     }
+    MessageSheet(viewModel = messageSheetViewModel)
 }
 
 /**
