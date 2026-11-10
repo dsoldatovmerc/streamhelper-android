@@ -46,6 +46,7 @@ fun ChatMessageRow(
             modifier = Modifier.padding(bottom = 4.dp),
         )
         ChatMessageText(message)
+        if (message.isDeleted) DeletedMarker()
     }
 }
 
