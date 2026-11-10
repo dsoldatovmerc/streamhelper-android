@@ -34,7 +34,9 @@ class MainActivity : ComponentActivity() {
         splash.setKeepOnScreenCondition { !startupGate.isReady.value }
         // After process death the in-memory session is gone; drop restored navigation state so
         // the app restarts through Entry instead of showing Main without a user.
-        super.onCreate(savedInstanceState.takeIf { startupGate.isReady.value })
+        // Config changes keep their state.
+        val restoredAfterProcessDeath = startupGate.isFirstActivityCreate() && savedInstanceState != null
+        super.onCreate(if (restoredAfterProcessDeath) null else savedInstanceState)
         // Light-only theme: always dark system-bar icons, regardless of the device's dark mode.
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),

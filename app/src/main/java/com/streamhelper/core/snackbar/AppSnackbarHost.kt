@@ -22,16 +22,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.streamhelper.R
 import com.streamhelper.core.ui.theme.AppColors
 
-private class AppSnackbarVisuals(val appMessage: SnackbarMessage) : SnackbarVisuals {
-    // Rendered by AppSnackbar from appMessage; the host only needs these for timing/accessibility.
-    override val message: String = appMessage.kind.name
+private class AppSnackbarVisuals(
+    val appMessage: SnackbarMessage,
+    /** Localized "title. description", used by the host for accessibility; AppSnackbar renders appMessage. */
+    override val message: String,
+) : SnackbarVisuals {
     override val actionLabel: String? = null
     override val withDismissAction: Boolean = false
     override val duration: SnackbarDuration = SnackbarDuration.Short
@@ -44,8 +45,17 @@ private class AppSnackbarVisuals(val appMessage: SnackbarMessage) : SnackbarVisu
 @Composable
 fun AppSnackbarHost(bus: SnackbarBus, modifier: Modifier = Modifier) {
     val hostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
     LaunchedEffect(bus) {
-        bus.messages.collect { hostState.showSnackbar(AppSnackbarVisuals(it)) }
+        bus.messages.collect { message ->
+            val title = resources.getString(message.kind.titleRes)
+            val description = when (val d = message.description) {
+                is UiText.Resource -> resources.getString(d.id)
+                is UiText.Literal -> d.value
+                null -> null
+            }
+            hostState.showSnackbar(AppSnackbarVisuals(message, listOfNotNull(title, description).joinToString(". ")))
+        }
     }
     SnackbarHost(hostState = hostState, modifier = modifier.safeDrawingPadding()) { data ->
         AppSnackbar(data)
@@ -55,9 +65,10 @@ fun AppSnackbarHost(bus: SnackbarBus, modifier: Modifier = Modifier) {
 @Composable
 private fun AppSnackbar(data: SnackbarData) {
     val message = (data.visuals as AppSnackbarVisuals).appMessage
-    val (title, accent) = when (message.kind) {
-        SnackbarMessage.Kind.Success -> stringResource(R.string.success) to Color(0xFF2E7D32)
-        SnackbarMessage.Kind.Error -> stringResource(R.string.error) to AppColors.Danger
+    val title = stringResource(message.kind.titleRes)
+    val accent = when (message.kind) {
+        SnackbarMessage.Kind.Success -> AppColors.Success
+        SnackbarMessage.Kind.Error -> AppColors.Danger
     }
     Snackbar(
         modifier = Modifier.padding(12.dp),

@@ -26,6 +26,7 @@ fun EntryScreen(
                 EntryEvent.NavigateToLogin -> toLogin()
                 EntryEvent.NavigateToMain -> toMain()
             }
+            viewModel.onNavigated()
         }
     }
 

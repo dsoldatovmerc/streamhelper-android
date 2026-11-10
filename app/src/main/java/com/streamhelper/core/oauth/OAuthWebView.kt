@@ -20,9 +20,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Full-screen in-app OAuth login (implicit flow). Loads [authorizeUrl] in a WebView with
+ * Full-screen in-app OAuth login (implicit flow). Loads [OAuthRequest.authorizeUrl] in a WebView with
  * JavaScript, DOM storage and third-party cookies enabled; intercepts any navigation to
- * [redirectUri] without loading it and reports exactly one [OAuthResult] via [onResult]:
+ * [OAuthRequest.redirectUri] without loading it and reports exactly one [OAuthResult] via [onResult]:
  * [OAuthResult.Success]/[OAuthResult.Failed] from the redirect, [OAuthResult.Cancelled] on system Back.
  *
  * Host it as an overlay above the caller's screen and remove it once [onResult] fires.
@@ -31,8 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun OAuthWebView(
-    authorizeUrl: String,
-    redirectUri: String,
+    request: OAuthRequest,
     onResult: (OAuthResult) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -56,15 +55,15 @@ fun OAuthWebView(
                 settings.domStorageEnabled = true
                 CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
                 webViewClient = object : WebViewClient() {
-                    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                        val result = OAuthRedirect.parse(request.url.toString(), redirectUri) ?: return false
+                    override fun shouldOverrideUrlLoading(view: WebView, webRequest: WebResourceRequest): Boolean {
+                        val result = OAuthRedirect.parse(webRequest.url.toString(), request.redirectUri) ?: return false
                         report(result)
                         return true
                     }
 
                     // Fallback: shouldOverrideUrlLoading isn't called for some navigations (e.g. POST).
                     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
-                        val result = OAuthRedirect.parse(url, redirectUri)
+                        val result = OAuthRedirect.parse(url, request.redirectUri)
                         if (result == null) {
                             super.onPageStarted(view, url, favicon)
                             return
@@ -73,7 +72,7 @@ fun OAuthWebView(
                         report(result)
                     }
                 }
-                loadUrl(authorizeUrl)
+                loadUrl(request.authorizeUrl)
             }
         },
         onRelease = { it.destroy() },

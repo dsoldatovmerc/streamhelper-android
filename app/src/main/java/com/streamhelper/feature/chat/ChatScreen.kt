@@ -4,10 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.streamhelper.R
+import com.streamhelper.core.ui.components.LoadingButton
 import com.streamhelper.core.ui.components.PlaceholderScreen
 
 /** RN: screens/Main/Chat. Logout button at the top (RN parity); the message list arrives in step 3. */
@@ -37,17 +34,12 @@ fun ChatScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Button(
+        LoadingButton(
+            text = stringResource(R.string.logout),
+            isLoading = state.isLoggingOut,
             onClick = viewModel::onLogoutClick,
-            enabled = !state.isLoggingOut,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-        ) {
-            if (state.isLoggingOut) {
-                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-            } else {
-                Text(stringResource(R.string.logout))
-            }
-        }
+        )
         PlaceholderScreen(label = "Chat — step 3", modifier = Modifier.weight(1f))
     }
 }

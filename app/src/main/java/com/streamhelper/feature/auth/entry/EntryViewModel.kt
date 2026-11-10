@@ -43,16 +43,22 @@ class EntryViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            try {
-                when (val destination = checkAuth()) {
-                    null -> snackbarBus.error(R.string.please_try_again)
-                    else -> _events.send(destination)
+            when (val destination = checkAuth()) {
+                null -> {
+                    snackbarBus.error(R.string.please_try_again)
+                    finishStartup()
                 }
-            } finally {
-                _uiState.value = EntryUiState(isChecking = false)
-                startupGate.markReady()
+                else -> _events.send(destination)
             }
         }
+    }
+
+    /** Called by the screen after it has navigated, so the splash hides over the next screen, not Entry. */
+    fun onNavigated() = finishStartup()
+
+    private fun finishStartup() {
+        _uiState.value = EntryUiState(isChecking = false)
+        startupGate.markReady()
     }
 
     /** Where to go next, or `null` when the token is valid but the user failed to load. */

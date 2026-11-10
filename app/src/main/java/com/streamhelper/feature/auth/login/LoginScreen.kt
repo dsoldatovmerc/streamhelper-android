@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +19,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.streamhelper.R
 import com.streamhelper.core.oauth.OAuthWebView
+import com.streamhelper.core.ui.components.LoadingButton
 
 /** RN: screens/Auth/Login — "Log In via Twitch" opens Twitch's login page in an in-app WebView overlay. */
 @Composable
@@ -46,19 +44,16 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(stringResource(R.string.app_title), style = MaterialTheme.typography.headlineMedium)
-            Button(onClick = viewModel::onLoginClick, enabled = !state.isLoading) {
-                if (state.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                } else {
-                    Text(stringResource(R.string.login))
-                }
-            }
+            LoadingButton(
+                text = stringResource(R.string.login),
+                isLoading = state.isLoading,
+                onClick = viewModel::onLoginClick,
+            )
         }
 
         state.oauthRequest?.let { request ->
             OAuthWebView(
-                authorizeUrl = request.authorizeUrl,
-                redirectUri = request.redirectUri,
+                request = request,
                 onResult = viewModel::onOAuthResult,
             )
         }

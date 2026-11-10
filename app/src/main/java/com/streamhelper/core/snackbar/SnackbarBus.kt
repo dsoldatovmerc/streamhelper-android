@@ -1,6 +1,7 @@
 package com.streamhelper.core.snackbar
 
 import androidx.annotation.StringRes
+import com.streamhelper.R
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.channels.Channel
@@ -9,7 +10,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 
 /** One app-wide snackbar: a "Success"/"Error" title plus an optional description (RN toast parity). */
 data class SnackbarMessage(val kind: Kind, val description: UiText? = null) {
-    enum class Kind { Success, Error }
+    enum class Kind(@StringRes val titleRes: Int) {
+        Success(R.string.success),
+        Error(R.string.error),
+    }
 }
 
 /**

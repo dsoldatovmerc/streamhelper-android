@@ -3,10 +3,11 @@ package com.streamhelper.feature.auth.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.streamhelper.R
+import com.streamhelper.core.oauth.OAuthRequest
 import com.streamhelper.core.oauth.OAuthResult
 import com.streamhelper.core.snackbar.SnackbarBus
 import com.streamhelper.feature.auth.data.AuthRepository
-import com.streamhelper.feature.auth.data.TwitchOAuthConfig
+import com.streamhelper.feature.auth.data.TwitchLogin
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -17,9 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-/** Request to show the OAuth WebView overlay. */
-data class OAuthRequest(val authorizeUrl: String, val redirectUri: String)
 
 data class LoginUiState(
     val isLoading: Boolean = false,
@@ -36,7 +34,7 @@ sealed interface LoginEvent {
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val snackbarBus: SnackbarBus,
-    private val oauthConfig: TwitchOAuthConfig,
+    @TwitchLogin private val loginRequest: OAuthRequest,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -47,9 +45,7 @@ class LoginViewModel @Inject constructor(
 
     fun onLoginClick() {
         if (_uiState.value.isLoading || _uiState.value.oauthRequest != null) return
-        _uiState.update {
-            it.copy(oauthRequest = OAuthRequest(oauthConfig.authorizeUrl, oauthConfig.redirectUri))
-        }
+        _uiState.update { it.copy(oauthRequest = loginRequest) }
     }
 
     fun onOAuthResult(result: OAuthResult) {

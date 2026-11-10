@@ -31,7 +31,10 @@ class AuthRepository @Inject constructor(
 ) {
     /** Reads the stored Twitch token into the session. Returns `null` if missing or blank. */
     suspend fun restoreToken(): String? {
-        val token = tokenStore.get(CredentialKey.TwitchAccessToken)?.takeIf { it.isNotBlank() }
+        val token = runCatchingNonCancel { tokenStore.get(CredentialKey.TwitchAccessToken) }
+            .onFailure { Log.w(TAG, "Reading stored token failed", it) }
+            .getOrNull()
+            ?.takeIf { it.isNotBlank() }
         session.setAccessToken(token)
         return token
     }
