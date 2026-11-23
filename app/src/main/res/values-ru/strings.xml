@@ -20,4 +20,6 @@
     <string name="timeout">Отстранить</string>
     <string name="chat_paused">Чат приостановлен</string>
     <string name="alerts_load_error">Не удалось загрузить оповещения</string>
+    <string name="donationalerts_login">Войти с помощью DonationAlerts</string>
+    <string name="anonymous">Аноним</string>
 </resources>
