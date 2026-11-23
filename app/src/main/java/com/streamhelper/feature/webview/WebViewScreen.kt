@@ -1,6 +1,7 @@
 package com.streamhelper.feature.webview
 
 import android.annotation.SuppressLint
+import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -18,6 +19,9 @@ fun WebViewScreen(uri: String) {
         modifier = Modifier.fillMaxSize().safeDrawingPadding(),
         factory = { context ->
             WebView(context).apply {
+                // AndroidView gives the view WRAP_CONTENT params; WebView then forces the page's layout
+                // height to 0 (100%/vh resolve to 0), so full-height pages like Twitch login render blank.
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true
                 CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
