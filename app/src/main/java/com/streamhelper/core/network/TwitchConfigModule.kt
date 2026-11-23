@@ -17,6 +17,11 @@ annotation class TwitchHelixBaseUrl
 @Retention(AnnotationRetention.BINARY)
 annotation class TwitchIdBaseUrl
 
+/** URL of Twitch's EventSub WebSocket (`wss://eventsub.wss.twitch.tv/ws`), without query parameters. */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class TwitchEventSubUrl
+
 /** Twitch application client id, sent as `Client-Id` and used in authorize/revoke URLs. */
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -36,6 +41,10 @@ object TwitchConfigModule {
     @Provides
     @TwitchIdBaseUrl
     fun idBaseUrl(): String = "https://id.twitch.tv/oauth2/"
+
+    @Provides
+    @TwitchEventSubUrl
+    fun eventSubUrl(): String = AppConfig.TWITCH_WS_URL
 
     @Provides
     @TwitchClientId
