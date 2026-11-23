@@ -78,9 +78,6 @@ class ChatViewModel @Inject constructor(
     /** The list reached (true) or the user scrolled away from (false) the bottom. */
     fun onAtBottomChanged(isAtBottom: Boolean) = _uiState.update { it.copy(isPaused = !isAtBottom) }
 
-    /** A message row was tapped. No-op for now; the moderation ticket opens its bottom sheet here. */
-    fun onMessageClick(message: ChatMessage) = Unit
-
     /** Revoke + clear credentials + logout hooks. Navigates to Auth on revoke success; otherwise shows an error and stays. */
     fun onLogoutClick() {
         if (_uiState.value.isLoggingOut) return

@@ -54,6 +54,7 @@ enum class ChatConnectionState {
 class ChatRepository @Inject constructor(
     private val socket: EventSubSocket,
     private val api: EventSubApi,
+    private val moderationApi: ChatModerationApi,
     private val session: TwitchSession,
     private val snackbarBus: SnackbarBus,
     @AppLifecycle private val appLifecycle: Lifecycle,
@@ -118,6 +119,16 @@ class ChatRepository @Inject constructor(
     /** Manual reconnect (pull-to-refresh). No-op while connected. */
     fun reconnect() {
         inputs.trySend(Input.Refresh)
+    }
+
+    /**
+     * Deletes a message on Twitch as the streamer (broadcaster and moderator), then
+     * [markDeleted]s it. Throws on HTTP errors and when signed out; the list is untouched then.
+     */
+    suspend fun deleteMessage(messageId: String) {
+        val me = session.userId ?: error("Not signed in")
+        moderationApi.deleteMessage(broadcasterId = me, moderatorId = me, messageId = messageId)
+        markDeleted(messageId)
     }
 
     /**
